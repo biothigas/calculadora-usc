@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Peso Outros - Calculadora de Notas</title>
+    <link rel="stylesheet" href="style.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap" rel="stylesheet" />
+  </head>
+
+  <body>
+    <header>
+      <nav>
+        <a class="logo" href="https://unisagrado.edu.br/">
+          <img src="imagem/logousc.png" alt="Logo USC" />
+        </a>
+        <div class="mobile-menu">
+          <div class="line1"></div>
+          <div class="line2"></div>
+          <div class="line3"></div>
+        </div>
+        <ul class="nav-list">
+          <li><a href="index.html">Início</a></li>
+          <li><a href="comofunciona.html">Como Funciona?</a></li>
+          <li><a href="peso8.html">Peso 8</a></li>
+          <li><a href="peso6.html">Peso 6</a></li>
+          <li><a href="pesooutros.html">Outro Peso</a></li>
+        </ul>
+      </nav>
+    </header>
+
+    <main>
+      <form id="notaForm" onsubmit="return false;" style="max-width: 360px; margin: 3rem auto; background: rgba(0,0,0,0.4); padding: 1.5rem; border-radius: 8px; color: #fff; font-family: 'Poppins', sans-serif;">
+        <h2 style="text-align: center; margin-bottom: 1rem;">Calculadora - Peso Outros</h2>
+        <p style="text-align: center; font-size: 0.85rem; margin-bottom: 1.2rem; color: #ccc;">
+          Calcule a nota de acordo com o peso de cada ferramenta avaliativa
+        </p>
+
+        <label for="p1">Nota da P1:</label>
+        <input type="number" id="p1" name="p1" step="0.01" min="0" max="10" required>
+
+        <label for="p2">Nota da P2:</label>
+        <input type="number" id="p2" name="p2" step="0.01" min="0" max="10" required>
+
+        <label for="outros">Nota de Outros:</label>
+        <input type="number" id="outros" name="outros" step="0.01" min="0" max="10" required>
+
+        <label for="quiz">Nota de Quiz:</label>
+        <input type="number" id="quiz" name="quiz" step="0.01" min="0" max="10" required>
+
+        <label for="pesoProva">Peso da Prova:</label>
+        <select id="pesoProva" required>
+          <option value="0.6">6</option>
+          <option value="0.7">7</option>
+          <option value="0.8">8</option>
+        </select>
+
+        <label for="pesoQuiz">Peso do Quiz:</label>
+        <select id="pesoQuiz" required>
+          <option value="0.1">1</option>
+          <option value="0.2">2</option>
+          <option value="0.3">3</option>
+        </select>
+
+        <label for="pesoOutros">Peso de Outros:</label>
+        <select id="pesoOutros" required>
+          <option value="0.1">1</option>
+          <option value="0.2">2</option>
+          <option value="0.3">3</option>
+        </select>
+
+        <div style="display: flex; justify-content: space-between; margin-top: 1rem;">
+          <button id="calcular" type="submit" style="background: #28a745; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer;">Calcular</button>
+          <button id="limpar" type="button" style="background: #dc3545; color: white; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; cursor: pointer;">Limpar</button>
+        </div>
+
+        <div id="resultado" style="margin-top: 1rem; font-weight: 700; text-align: center;"></div>
+      </form>
+    </main>
+
+    <script src="mobile-navbar.js"></script>
+    <script>
+        const form = document.getElementById('notaForm');
+        const resultado = document.getElementById('resultado');
+        const limparBtn = document.getElementById('limpar');
+        const pesoProvaSelect = document.getElementById('pesoProva');
+        const pesoQuizSelect = document.getElementById('pesoQuiz');
+        const pesoOutrosSelect = document.getElementById('pesoOutros');
+      
+        // Todas combinações possíveis
+        const pesosValidos = {
+          0.6: [ [0.3, 0.1], [0.2, 0.2], [0.1, 0.3] ],
+          0.7: [ [0.2, 0.1], [0.1, 0.2] ],
+          0.8: [ [0.1, 0.1] ]
+        };
+      
+        function atualizarQuizOptions() {
+          const pesoProva = parseFloat(pesoProvaSelect.value);
+          const combinacoes = pesosValidos[pesoProva];
+      
+          // Limpar select de quiz
+          pesoQuizSelect.innerHTML = '';
+          pesoOutrosSelect.innerHTML = '';
+      
+          combinacoes.forEach(([quiz, outros]) => {
+            const option = document.createElement('option');
+            option.value = quiz.toFixed(1);
+            option.textContent = (quiz * 10).toFixed(0);
+            pesoQuizSelect.appendChild(option);
+          });
+      
+          // Dispara sincronização com o primeiro valor
+          pesoQuizSelect.selectedIndex = 0;
+          sincronizarOutrosComQuiz();
+        }
+      
+        function sincronizarOutrosComQuiz() {
+          const pesoProva = parseFloat(pesoProvaSelect.value);
+          const pesoQuiz = parseFloat(pesoQuizSelect.value);
+          const combinacoes = pesosValidos[pesoProva];
+      
+          // Encontrar a combinação válida com o quiz selecionado
+          const encontrada = combinacoes.find(([quiz]) => quiz === pesoQuiz);
+      
+          pesoOutrosSelect.innerHTML = '';
+      
+          if (encontrada) {
+            const outros = encontrada[1];
+            const option = document.createElement('option');
+            option.value = outros.toFixed(1);
+            option.textContent = (outros * 10).toFixed(0);
+            pesoOutrosSelect.appendChild(option);
+          }
+        }
+      
+        window.addEventListener('DOMContentLoaded', atualizarQuizOptions);
+        pesoProvaSelect.addEventListener('change', atualizarQuizOptions);
+        pesoQuizSelect.addEventListener('change', sincronizarOutrosComQuiz);
+      
+        form.addEventListener('submit', () => {
+          const p1 = parseFloat(form.p1.value);
+          const p2 = parseFloat(form.p2.value);
+          const outros = parseFloat(form.outros.value);
+          const quiz = parseFloat(form.quiz.value);
+      
+          const pesoProva = parseFloat(pesoProvaSelect.value);
+          const pesoQuiz = parseFloat(pesoQuizSelect.value);
+          const pesoOutros = parseFloat(pesoOutrosSelect.value);
+      
+          const notaFinal = (((p1 + p2) * pesoProva) / 2) + (quiz * pesoQuiz) + (outros * pesoOutros);
+          const notaFinalLimitada = Math.min(notaFinal, 10);
+      
+          let mensagemExtra = '';
+          if (notaFinal > 10) {
+            mensagemExtra = '<br><span style="color: #ffc107;">A nota foi limitada para 10.</span>';
+          } else if (notaFinal >= 4.76 && notaFinal <= 4.99) {
+            mensagemExtra = '<br><span style="color: #ffc107;">Sua nota vai ser arredondada para 5 pelo sistema.</span>';
+          } else if (notaFinal >= 6.76 && notaFinal <= 6.99) {
+            mensagemExtra = '<br><span style="color: #ffc107;">Sua nota vai ser arredondada para 7 pelo sistema.</span>';
+          } else if (notaFinal >= 5.76 && notaFinal <= 5.99) {
+            mensagemExtra = '<br><span style="color: #ffc107;">Sua nota vai ser arredondada para 6 pelo sistema.</span>';
+          }
+      
+          resultado.innerHTML = `Sua nota final é: ${notaFinalLimitada.toFixed(2)}${mensagemExtra}`;
+        });
+      
+        limparBtn.addEventListener('click', () => {
+          form.reset();
+          resultado.textContent = '';
+          atualizarQuizOptions();
+        });
+      </script>
+      
+  </body>
+</html>
